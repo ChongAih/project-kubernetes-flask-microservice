@@ -1,0 +1,31 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+flask-restplus = "==0.12.1"
+flask = "==1.0.3"
+flask_script = "*"
+flask_bcrypt = "*"
+jinja2 = "==3.0.1"
+itsdangerous = "==2.0.1"
+werkzeug = "==0.15.5"
+pipfile = "*"
+requests = "*"
+pyyaml = "*"
+
+[dev-packages]
+flask-restplus = "==0.12.1"
+flask = "==1.0.3"
+flask_script = "*"
+flask_bcrypt = "*"
+jinja2 = "==3.0.1"
+itsdangerous = "==2.0.1"
+werkzeug = "==0.15.5"
+pipfile = "*"
+requests = "*"
+pyyaml = "*"
+
+[requires]
+python_version = "3.8"
