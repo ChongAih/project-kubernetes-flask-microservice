@@ -2,14 +2,14 @@ from flask import Blueprint
 from flask import Flask
 from flask_restplus import Api
 
-from app.calculator.computation.db import create_table
+from app import CalculatorMicroservice
 from app.calculator.computation.service import run_calculator_qm_task
 from app.calculator.controller.controller import calculator_api
 
 
-def start_app():
-    create_table()
-    run_calculator_qm_task()
+def start_app(ms: CalculatorMicroservice):
+    ms.calculator_db.create_table()
+    run_calculator_qm_task(ms)
     app = Flask(__name__)
     blueprint = register_blueprint_v1()
     app.register_blueprint(blueprint)

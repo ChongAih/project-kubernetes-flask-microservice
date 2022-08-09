@@ -4,7 +4,6 @@ import threading
 from datetime import datetime
 from queue import PriorityQueue, Full
 
-import app
 from app.util.logger import logger
 
 
@@ -12,9 +11,9 @@ class ThreadPriorityQueueManager:
     def __init__(self, service: str = None, parallelism: int = None, max_limit: int = None,
                  queue_block_timeout: float = None):
         self.service = service
-        self.parallelism = parallelism if parallelism else app.config.CONSUMER_PARALLELISM
-        self.max_limit = max_limit if max_limit else app.config.QUEUE_SIZE
-        self.queue_block_timeout = queue_block_timeout if queue_block_timeout else app.config.QUEUE_BLOCK_TIMEOUT
+        self.parallelism = parallelism
+        self.max_limit = max_limit
+        self.queue_block_timeout = queue_block_timeout
         self.queue = dict()
         logger.info(
             f'ThreadPriorityQueueManager for {service} with {self.parallelism} parallelism and {self.max_limit} queue size '

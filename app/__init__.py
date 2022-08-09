@@ -2,7 +2,8 @@ import functools
 import os
 from typing import Optional
 
-from app.config import ProductionConfig, Config
+from app.calculator.computation.database import CalculatorDatabase
+from app.config import ProductionConfig, Config, config_by_env
 from app.util.logger import logger
 from app.util.process_queue_manager import ProcessQueueManager
 
@@ -26,32 +27,44 @@ class CalculatorProcessQueueManager(ProcessQueueManager):
     pass
 
 
+class CalculatorMicroservice:
+    def __init__(self, mode):
+        logger.info(f"Initializing a CalculatorMicroservice by Process-{os.getpid()}")
+        self.config = initialize_config(mode)
+        self.calculator_db = CalculatorDatabase(self.config)
+        self.calculator_qm = initialize_calculator_process_qm(self.config)
+
+
 # To be called in every child process
-def initialize_config():
-    flask_microservice_env = os.getenv("FLASK_MICROSERVICE_ENV")
-    global config
-    if not config:
-        logger.info(f"Initializing config based on FLASK_MICROSERVICE_ENV ({str(flask_microservice_env)})"
-                    f" by Process-{os.getpid()}")
-        if flask_microservice_env in ["test", None]:
-            logger.info(f"Setting global variable 'config' to be {Config.__name__}")
-            config = Config()
-        else:
-            logger.info(f"Setting global variable 'config' to be {ProductionConfig.__name__}")
-            config = ProductionConfig()
+def initialize_config(mode):
+    _config: Optional[Config] = None
+    logger.info(f"Initializing config based on mode ({str(mode)}) by Process-{os.getpid()}")
+    if mode in ["test", None]:
+        logger.info(f"Setting global variable 'config' to be {Config.__name__}")
+        _config = Config()
+    else:
+        logger.info(f"Setting global variable 'config' to be {ProductionConfig.__name__}")
+        _config = ProductionConfig()
+    return _config
 
 
 # To be called in only parent process
-def initialize_calculator_process_qm():
-    global calculator_qm
-    if not calculator_qm:
-        logger.info(f"Initializing a singleton calculator process qm by Process-{os.getpid()}")
-        calculator_qm = CalculatorProcessQueueManager(service='calculator')
+def initialize_calculator_process_qm(config: Config):
+    logger.info(f"Initializing a singleton calculator process qm by Process-{os.getpid()}")
+    calculator_qm = CalculatorProcessQueueManager(service='calculator', parallelism=config.CONSUMER_PARALLELISM,
+                                                  max_limit=config.QUEUE_SIZE,
+                                                  queue_block_timeout=config.QUEUE_BLOCK_TIMEOUT)
+    return calculator_qm
 
 
-# Global variable to be set based on env variable/ during startup
-config: Optional[Config] = None
-calculator_qm: Optional[ProcessQueueManager] = None
+def initialize_calculator_micro_service():
+    global calculator_ms
+    if not calculator_ms:
+        flask_microservice_env = os.getenv("FLASK_MICROSERVICE_ENV")
+        calculator_ms = CalculatorMicroservice(flask_microservice_env)
+    return calculator_ms
 
-# To be initialized for parent and child processes
-initialize_config()
+
+# Global variable to be set based on env variable/ during start up in main process
+# Initialization is protected in entry point to prevent error in spawn child process
+calculator_ms: Optional[CalculatorMicroservice] = None

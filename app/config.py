@@ -17,3 +17,9 @@ class ProductionConfig(Config):
     CALCULATOR_SQLITE_DB_NAME = "calculator"
     CALCULATOR_SQLITE_TABLE_NAME = "computation"
     DB_PATH = "/database"
+
+
+config_by_env = {
+    "test": Config,
+    "prod": ProductionConfig
+}

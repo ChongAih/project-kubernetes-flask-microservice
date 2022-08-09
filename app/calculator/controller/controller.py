@@ -1,7 +1,6 @@
 from flask import request
 from flask_restplus import Resource
 
-import app
 from app.calculator.computation.api import handle_evaluate, handle_status, handle_result
 from app.calculator.serializer.dto import Dto
 
@@ -13,16 +12,13 @@ response_model = Dto.response_model
 result_model = Dto.result_model
 
 
-# run_calculator_qm_task()
-
-
 @calculator_api.route("/evaluate")
 class EvaluateRequestHandler(Resource):
     @calculator_api.expect(evaluate_request_model, validate=True)
     @calculator_api.doc("to submit computation request and request response will be returned for subsequent query")
     @calculator_api.marshal_with(response_model)
     def post(self):
-        return handle_evaluate(data=request.json, qm=app.calculator_qm)
+        return handle_evaluate(data=request.json)
 
 
 @calculator_api.route("/status")
