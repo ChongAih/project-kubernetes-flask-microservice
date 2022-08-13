@@ -1,0 +1,10 @@
+# ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flask-microservice-config
+  namespace: flask-microservice-namespace
+data:
+  # property-like keys; each key maps to a simple value
+  FLASK_MICROSERVICE_PORT: "5000"
+  FLASK_MICROSERVICE_ENV: "prod"
