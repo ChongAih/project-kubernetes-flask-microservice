@@ -1,7 +1,7 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
-IMAGE_NAME="flask-microservice"
+IMAGE_NAME="flask_microservice"
 FLASK_MICROSERVICE_PORT=5000
-FLASK_MICROSERVICE_ENV="production"
+FLASK_MICROSERVICE_ENV="prod"
 
 # Remove any running or completed container with the same name
 docker container ls -la -q --filter "name=$IMAGE_NAME" | grep -q . && docker container stop $IMAGE_NAME
@@ -19,4 +19,7 @@ docker build \
 docker container run \
   -p $FLASK_MICROSERVICE_PORT:$FLASK_MICROSERVICE_PORT \
   -v "$SCRIPT_DIR"/database:/database \
+  --cpus=2 \
+  --memory="1g" \
+  --memory-swap="2g" \
   --rm --name $IMAGE_NAME -d $IMAGE_NAME

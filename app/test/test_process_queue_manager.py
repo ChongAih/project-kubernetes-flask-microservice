@@ -18,8 +18,6 @@ def task(queue: Queue):
         except Empty:
             logger.info(f'Queue is empty, exiting')
             break
-        import time
-        time.sleep(1)
         logger.info(f'Payload: {payload}; processed by: Process-{os.getpid()}; queue size: {queue.qsize()}')
         if payload['api'] == 'terminate':
             break
@@ -54,7 +52,7 @@ class TestThreadPriorityQueueManager(unittest.TestCase):
     def test_3_consumers(self):
         self.qm.consumers(task)
         # Allocate processing time
-        time.sleep(10)
+        time.sleep(5)
 
     @classmethod
     def tearDownClass(cls) -> None:

@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import datetime
 from multiprocessing import Queue
 from queue import Empty
@@ -35,15 +36,16 @@ def task(queue: Queue, db: CalculatorDatabase, config: Config):
             logger.info("Unsupported api type")
 
     while queue:
-        # Block and wait if no incoming message
+        # Block and wait if no incoming message in child process - not affecting parent process
         try:
             payload = json.loads(queue.get(block=True, timeout=config.QUEUE_BLOCK_TIMEOUT))
+            logger.info(f"Task is being executed by Process-{os.getpid()}...")
             if payload["api"] == "terminate":
                 break
             else:
                 wrapper(data=payload)
         except Empty:
-            logger.info("Queue is empty, rechecking...")
+            logger.info(f"Queue is empty, rechecking by Process-{os.getpid()}...")
 
 
 def startup_workflow(qm: ProcessQueueManager, db: CalculatorDatabase):
