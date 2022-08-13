@@ -66,7 +66,7 @@ as above. There are two options:
 
 * an external service of which the pod will expose
   a port (localhost:30000) for requests to be directed to.
-* an internal service of which the pod will
+* (ongoing) an internal service of which the pod will
   expose an internal port to only Ingress (with load balancer function) and requests will be
   directed by Ingress to the corresponding interval service container port
 
