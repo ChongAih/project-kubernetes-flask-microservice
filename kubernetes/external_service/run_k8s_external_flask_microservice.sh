@@ -5,6 +5,8 @@ NAMESPACE="flask-microservice-namespace"
 CONFIG_YAML="flask_microservice_config.yaml"
 DEPLOYMENT_SERVICE_YAML="flask_microservice.yaml"
 DEPLOYMENT_POD_NAME_PREFIX="flask-microservice-deployment"
+PV_NAME="flask-microservice-local-pv"
+PVC_NAME="flask-microservice-pvc"
 
 if [ -z "$command" ];then
 	command=""
@@ -19,6 +21,13 @@ if [ "$command" = "start" ]; then
   if [ "$?" = "1" ]; then
     kubectl create namespace $NAMESPACE
   fi;
+
+  # Create storage class, PVC, PV
+  mkdir -p /Users/chongaih.hau/data/volumes/flask_microservice_pv
+  chmod 777 /Users/chongaih.hau/data/volumes/flask_microservice_pv
+  kubectl apply -f storage_class.yaml
+  kubectl apply -f pv.yaml
+  kubectl apply -f pvc.yaml
 
   # Create config & secret
   kubectl apply -f $CONFIG_YAML
@@ -52,7 +61,12 @@ elif [ "$command" = "stop" ]; then
   echo "Stopping and removing all Kubernetes pods, services and etc..."
   kubectl delete -f $CONFIG_YAML
   kubectl delete -f $DEPLOYMENT_SERVICE_YAML
-#  kubectl delete namespace $NAMESPACE
+  kubectl patch pv $PV_NAME -p '{"metadata":{"finalizers":null}}'
+  kubectl patch pvc $PVC_NAME -p '{"metadata":{"finalizers":null}}'  -n $NAMESPACE
+  kubectl delete -f pvc.yaml
+  kubectl delete -f pv.yaml
+  kubectl delete -f storage_class.yaml
+  #  kubectl delete namespace $NAMESPACE
 
   # Ensure proper termination of pod
   pod_terminating=0

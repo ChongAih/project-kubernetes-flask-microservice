@@ -20,6 +20,10 @@ spec:
       labels:
         app: flask-microservice
     spec:
+      volumes:
+        - name: local-persistent-storage
+          persistentVolumeClaim:
+            claimName: flask-microservice-pvc
       containers:
         - name: flask-microservice
           image: flask_microservice:prod
@@ -43,6 +47,9 @@ spec:
                 configMapKeyRef:
                   name: flask-microservice-config
                   key: FLASK_MICROSERVICE_ENV
+          volumeMounts:
+            - name: local-persistent-storage
+              mountPath: /database # path in the image to be mounted to volume
 ---
 # Service - expose an application running on a set of Pods as a network service
 apiVersion: v1

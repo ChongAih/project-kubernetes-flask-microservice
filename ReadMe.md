@@ -94,4 +94,6 @@ kubectl describe svc <service name> -n flask-microservice-namespace
 kubectl describe pod <pod name> -n flask-microservice-namespace
 kubectl logs -f <pod name> -n flask-microservice-namespace
 kubectl get node -o wide -n flask-microservice-namespace 
+kubectl get pv -o json -n flask-microservice-namespace
+kubectl get pvc -o json -n flask-microservice-namespace
 ```
